@@ -2,8 +2,12 @@ from flask import Flask, render_template, url_for, redirect, abort, request
 from data import db_session
 from data.users import User
 from data.news import News
+from data.obs import Obs
+from data.sob import Sob
 from forms.user import RegisterForm, LoginForm
 from forms.news import NewsForm
+from forms.obs_form import ObsForm
+from forms.sobs import SobForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import datetime
 
@@ -42,7 +46,7 @@ def edit_news(id):
             news.title = form.title.data
             news.content = form.content.data
             db_sess.commit()
-            return redirect('/')
+            return redirect('/news')
         else:
             abort(404)
     return render_template('news_red.html',
@@ -87,15 +91,53 @@ def index():
     db_sess = db_session.create_session()
     news = db_sess.query(News)
     teacher = db_sess.query(User).filter(User.is_teacher == 1)
-    return render_template("news.html", news=news, teacher=teacher)
+    return render_template("news.html", news=news)
 
 
-@app.route("/news/<int:id>", methods=['GET', 'POST'])
+@app.route("/user")
+def users():
+    db_session.global_init("db/blogs.db")
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == current_user.id)
+    return render_template("user.html", user=user)
+
+
+@app.route("/sob")
+def indexsob():
+    db_session.global_init("db/blogs.db")
+    db_sess = db_session.create_session()
+    sob = db_sess.query(Sob)
+    return render_template("sob.html", sob=sob)
+
+
+@app.route("/obs/<int:id>", methods=['GET', 'POST'])
 def obs(id):
     db_session.global_init("db/blogs.db")
     db_sess = db_session.create_session()
     news = db_sess.query(News).filter(News.id == id,
                                       ).first()
+    obs = db_sess.query(Obs).filter(Obs.news_id == id,
+                                    )
+    return render_template("obs.html", news=news, title=news.title, id=news.id, obs=obs)
+
+
+@app.route('/obs_add/<int:id>', methods=['GET', 'POST'])
+@login_required
+def obs_news(id):
+    form = ObsForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        obs = Obs()
+        obs.content = form.content.data
+        obs.name = form.name.data
+        news = db_sess.query(News).filter(News.id == id,
+                                          ).first()
+        obs.news_id = news.id
+        db_sess.add(obs)
+        db_sess.commit()
+        return redirect(f'/obs/{id}')
+    return render_template('obs_red.html', title='Добавление комментария',
+                           form=form)
 
 
 @app.route('/news_add', methods=['GET', 'POST'])
@@ -111,8 +153,25 @@ def add_news():
         current_user.news.append(news)
         db_sess.merge(current_user)
         db_sess.commit()
-        return redirect('/')
+        return redirect('/news')
     return render_template('news_red.html', title='Добавление новости',
+                           form=form)
+
+
+@app.route('/sob_add', methods=['GET', 'POST'])
+@login_required
+def add_sob():
+    form = SobForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        sob = Sob()
+        sob.title = form.title.data
+        sob.content = form.content.data
+        sob.date = form.date.data
+        db_sess.add(sob)
+        db_sess.commit()
+        return redirect('/sob')
+    return render_template('sob_red.html', title='Добавление новости',
                            form=form)
 
 

@@ -19,8 +19,10 @@
         <a href="/news_delete/{{ item.id }}" class="btn btn-danger">
             Удалить
         </a>
-        <a class="btn btn-success" href="/news/{{ item.id }}">Обсудить</a>
+        <a class="btn btn-success" href="/obs/{{ item.id }}">Обсудить</a>
     </div>
+    {% else %}
+    <a class="btn btn-success" href="/obs/{{ item.id }}">Обсудить</a>
     {% endif %}
 </div>
 {% endfor %}

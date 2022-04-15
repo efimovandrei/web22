@@ -19,7 +19,6 @@ class User(SqlAlchemyBase, UserMixin):
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                      default=datetime.datetime.now)
     is_teacher = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
-
     news = orm.relation("News", back_populates='user')
 
     def set_password(self, password):
