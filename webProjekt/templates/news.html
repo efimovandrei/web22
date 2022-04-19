@@ -27,8 +27,11 @@
 </div>
 {% endfor %}
 {% if current_user.is_authenticated%}
-
+{% for i in teacher%}
+{%if i.is_teacher == True%}
 <a href="/news_add" class="btn btn-secondary">Добавить новость</a>
+{%endif%}
+{%endfor%}
 
 {% endif %}
 

@@ -90,8 +90,8 @@ def index():
     db_session.global_init("db/blogs.db")
     db_sess = db_session.create_session()
     news = db_sess.query(News)
-    teacher = db_sess.query(User).filter(User.is_teacher == 1)
-    return render_template("news.html", news=news)
+    teacher = db_sess.query(User).filter(User.id == current_user.id)
+    return render_template("news.html", news=news, teacher=teacher)
 
 
 @app.route("/user")
