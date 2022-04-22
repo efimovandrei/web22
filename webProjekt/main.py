@@ -107,7 +107,8 @@ def indexsob():
     db_session.global_init("db/blogs.db")
     db_sess = db_session.create_session()
     sob = db_sess.query(Sob)
-    return render_template("sob.html", sob=sob)
+    teacher = db_sess.query(User).filter(User.id == current_user.id)
+    return render_template("sob.html", sob=sob, teacher=teacher)
 
 
 @app.route("/obs/<int:id>", methods=['GET', 'POST'])

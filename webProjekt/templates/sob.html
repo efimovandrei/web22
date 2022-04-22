@@ -15,9 +15,11 @@
 </div>
 {% endfor %}
 {% if current_user.is_authenticated%}
-
+{% for i in teacher%}
+{%if i.is_teacher == True%}
 <a href="/sob_add" class="btn btn-secondary">Добавить мероприятие</a>
-
+{%endif%}
+{%endfor%}
 {% endif %}
 
 {% endblock %}
